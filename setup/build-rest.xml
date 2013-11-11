@@ -1,0 +1,60 @@
+<project name="Local Deployment" default="localDeploy" basedir=".">
+
+	<property file="build.properties" />
+	<property file="users/${user.name}/local.properties" />
+
+	<target name="init">
+	</target>
+
+	<target name="check-config-file-exists">
+	    <available file="users/${user.name}/my.conn.php" property="db.file.present"/>
+		
+	</target>
+
+	
+	<target name="_checkLocalDeploySetup" depends="check-config-file-exists" unless="local.web.rest.folder">
+		<echo message="*****************************************************************" />
+		<echo message="IMPORTANT: Please Complete Local Configuration Steps" />
+		<echo message="Complete User Setup steps 1-3, See: build/setup-local.xml" />
+		<echo message="Local Deployment Failed" />
+		<echo message="*****************************************************************" />
+		<echo message="db file present: ${db.file.present}" />
+		<echo message="rest folder ${local.web.rest.folder}"  />
+		
+	</target>
+
+	
+    <target name="_localDeploy" if="local.web.rest.folder">
+    	<echo message="Deploying to Local Folder" />
+    	
+        <copy todir="${local.web.rest.folder}" overwrite="true">
+            <fileset dir="../common/site/" includes="**">
+            </fileset>
+        </copy>    	
+    	
+        <copy todir="${local.web.rest.folder}" overwrite="true">
+            <fileset dir="../rest-api/site/" includes="**">
+            </fileset>
+        </copy>
+    	
+		<concat destfile="${local.web.rest.folder}/.htaccess">
+			<fileset dir="config/rest/local/" includes="htaccess-start" />
+			<fileset dir="../rest-api/site/" includes=".htaccess" />
+		</concat>
+    	
+		
+    	<echo message="Deploying Local DB connection file for ${user.name}" />
+    	<copy file="users/${user.name}/my.conn.php" 
+			tofile="${local.web.rest.folder}/config/includes/db/db.conn.prod.php" overwrite="true" />
+    	
+    	<echo message="Deployment Complete" />
+    </target>
+	
+    <target name="localDeploy" depends="init,_checkLocalDeploySetup,_localDeploy">
+    </target>
+	
+    <target name="gen">
+    	<ant dir="../common/Inform8" />
+    </target>
+
+</project>

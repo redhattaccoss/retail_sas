@@ -1,0 +1,13 @@
+Options +FollowSymlinks
+
+RewriteEngine on
+
+RewriteRule error$ error.php [L,S=1]
+RewriteRule error.php$ error.php [L]
+
+RewriteRule rest.php$ rest.php [L]
+
+RewriteRule ^config/(.*) /index.htm [R]
+RewriteRule ^logs/(.*) /index.htm [R]
+
+RewriteRule ^([A-Z][a-z]*)\.htm$ index.htm [QSA,NC]
